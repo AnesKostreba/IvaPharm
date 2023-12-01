@@ -45,11 +45,12 @@ export class AdministratorService {
                 resolve(response);
             })
         })
+        
         // DTO -> Model
         // username -> username
         // password -> passwordHash
     }
-
+    
     async editById(administratorId: number, data: EditAdministratorDto):Promise<Administrator | ApiResponse>{
         let admin: Administrator = await this.administrator.findOne({ where: { administratorId } });
 
