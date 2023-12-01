@@ -14,7 +14,8 @@ export class CategoryService extends TypeOrmCrudService<Category> {
         super(category)
     }
 
-    async getMany(): Promise<Category[] | null> {
-        return this.category.find();
-    }
+    // async getMany(): Promise<Category[] | null> {
+    //     return this.category.find();
+    // } //Bez ovoga ne radi baca gresku ERROR [ExceptionsHandler] Cannot destructure property 'parsed' of 'req' as it is null.
+    // A SA OVIM NE RADE JOIN-ovi SAMO IZLISTA ALL CATEGORY
 }
