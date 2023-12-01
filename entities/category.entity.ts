@@ -53,7 +53,7 @@ export class Category {
   ])
   parentCategory: Category;
 
-  @OneToMany(() => Category, (category) => category.parentCategory)
+  @OneToMany(() => Category, category => category.parentCategory)
   categories: Category[];
 
   @OneToMany(() => Feature, (feature) => feature.category)
