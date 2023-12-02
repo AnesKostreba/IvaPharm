@@ -1,5 +1,7 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { LoggerMiddleware } from './logger.middleware';
 import { AppController } from './controllers/app.controller';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { databaseConfiguration } from 'config/database.configuration';
 import { Administrator } from 'entities/administrator.entity';
@@ -17,6 +19,9 @@ import { AdministratorService } from './services/administrator/administrator.ser
 import { AdministratorController } from './controllers/api/administrator.controller';
 import { CategoryController } from './controllers/api/category.controller';
 import { CategoryService } from './services/category/category.service';
+import { ErrorInterceptor } from 'interceptors/error.interceptors';
+import { ArticleService } from './services/article/article.service';
+import { ArticleController } from './controllers/api/article.controller';
 
 @Module({
   imports: [
@@ -43,17 +48,32 @@ import { CategoryService } from './services/category/category.service';
     }),
     TypeOrmModule.forFeature([
       Administrator,
-      Category
+      Category,
+      Article
     ])
   ],
   controllers: [
     AppController,
     AdministratorController,
     CategoryController,
+    ArticleController
   ],
   providers: [
     AdministratorService,
-    CategoryService
+    CategoryService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ErrorInterceptor,
+    },
+    ArticleService
   ],
 })
-export class AppModule { }
+
+
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes('*');
+  }
+}
