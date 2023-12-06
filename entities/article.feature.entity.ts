@@ -31,15 +31,19 @@ export class ArticleFeature {
   @Column({ type: "varchar", length: 255})
   value: string;
 
-  @ManyToOne(() => Article, (article) => article.articleFeatures, {
-    onDelete: "RESTRICT",
+  @ManyToOne(
+    () => Article,
+    article => article.articleFeatures, {
+    onDelete: "NO ACTION",
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "article_id", referencedColumnName: "articleId" }])
   article: Article;
 
-  @ManyToOne(() => Feature, (feature) => feature.articleFeatures, {
-    onDelete: "RESTRICT",
+  @ManyToOne(
+    () => Feature,
+    feature => feature.articleFeatures, {
+    onDelete: "NO ACTION",
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "feature_id", referencedColumnName: "featureId" }])

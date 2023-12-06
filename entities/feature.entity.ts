@@ -26,8 +26,11 @@ export class Feature {
   @Column({type: "int",  name: "category_id", unsigned: true})
   categoryId: number;
 
-  @OneToMany(() => ArticleFeature, (articleFeature) => articleFeature.feature)
-  articleFeatures: ArticleFeature[];
+  @OneToMany(
+    () => ArticleFeature,
+   articleFeature => articleFeature.feature
+   )
+   articleFeatures: ArticleFeature[];
 
   @ManyToMany(type => Article, article=> article.features)
   @JoinTable({
@@ -37,8 +40,11 @@ export class Feature {
   })
   articles: Article[];
 
-  @ManyToOne(() => Category, (category) => category.features, {
-    onDelete: "RESTRICT",
+  @ManyToOne(
+    () => Category,
+    category => category.features,
+  {
+    onDelete: "NO ACTION",
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "category_id", referencedColumnName: "categoryId" }])
