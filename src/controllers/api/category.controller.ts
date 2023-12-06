@@ -16,6 +16,7 @@ import { ApiTags } from '@nestjs/swagger';
     }
   },
   query: {
+    alwaysPaginate: true,
     join: {
       categories: {
         eager: true
@@ -30,7 +31,16 @@ import { ApiTags } from '@nestjs/swagger';
         eager: false
       }
     }
-  }
+  },
+  routes: {
+    only: [
+      'getManyBase',
+      'getOneBase',
+      'createOneBase',
+      'updateOneBase',
+      'deleteOneBase',
+    ],
+  },
 })
 @ApiTags('api/category')
 @Controller('api/category')

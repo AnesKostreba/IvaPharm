@@ -14,7 +14,6 @@ import { ArticleFeature } from "./article.feature.entity";
 import { ArticlePrice } from "./article.price.entity";
 import { CartArticle } from "./cart.article.entity";
 import { Photo } from "./photo.entity";
-import { type } from "os";
 import { Feature } from "./feature.entity";
 
 @Index("fk_article_category_id", ["categoryId"], {})
@@ -57,14 +56,18 @@ export class Article {
   })
   createdAt: Date;
 
-  @ManyToOne(() => Category, (category) => category.articles, {
+  @ManyToOne(
+    () => Category,
+    (category) => category.articles, {
     onDelete: "RESTRICT",
     onUpdate: "CASCADE",
   })
   @JoinColumn([{ name: "category_id", referencedColumnName: "categoryId" }])
   category: Category;
 
-  @OneToMany(() => ArticleFeature, (articleFeature) => articleFeature.article)
+  @OneToMany(
+  () => ArticleFeature, 
+  (articleFeature) => articleFeature.article)
   articleFeatures: ArticleFeature[];
 //
   @ManyToMany(type => Feature, feature=> feature.articles)
@@ -76,7 +79,9 @@ export class Article {
   features: Feature[];
   //
 
-  @OneToMany(() => ArticlePrice, (articlePrice) => articlePrice.article)
+  @OneToMany(
+  () => ArticlePrice,
+  (articlePrice) => articlePrice.article)
   articlePrices: ArticlePrice[];
 
   @OneToMany(() => CartArticle, (cartArticle) => cartArticle.article)
