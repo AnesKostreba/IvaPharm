@@ -23,6 +23,7 @@ import { ErrorInterceptor } from 'interceptors/error.interceptors';
 import { ArticleService } from './services/article/article.service';
 import { ArticleController } from './controllers/api/article.controller';
 import { AuthController } from './controllers/api/auth.controller';
+import { AuthMiddleware } from './middlewares/auth.middleware';
 
 @Module({
   imports: [
@@ -71,13 +72,24 @@ import { AuthController } from './controllers/api/auth.controller';
     },
     ArticleService
   ],
+  exports:[
+    AdministratorService
+  ]
 })
 
 
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(LoggerMiddleware)
-      .forRoutes('*');
+    .apply(AuthMiddleware)//primeni ovaj middlware za proveru da li postoji token
+    .exclude('auth/*') //nad svim koji nisu (iskljuci)
+    .forRoutes('api/*')//a jesu ovi (ukljuci)
   }
+
+
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer
+  //     .apply(LoggerMiddleware)
+  //     .forRoutes('*');
+  // }
 }
