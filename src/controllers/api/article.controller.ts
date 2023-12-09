@@ -1,5 +1,5 @@
 import { Crud, CrudRequest, Override, ParsedRequest } from "@nestjsx/crud";
-import { Controller, Get, Post, Body, Param, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseInterceptors, UploadedFile, Req } from '@nestjs/common';
 import { ArticleService } from "src/services/article/article.service";
 import { Article } from "entities/article.entity";
 import { AddArticleDto } from "src/dtos/article/add.article.dto";
@@ -103,13 +103,15 @@ export class ArticleController {
         fileFilter: (req, file, callback) =>{
           // 1. provera ekstenzija : JPG, PNG
           if(!file.originalname.toLowerCase().match(/\.(jpg|png)$/)){
-            callback(new Error('Bad file extensions!'), false);
+            req.fileFilterError = "Bad file extension!";
+            callback(null, false);
             return;
           }
 
           // 2. provera tipa sadrzaja: image/jpeg, image/png (mimetype)
           if(!(file.mimetype.includes('jpeg') || file.mimetype.includes('png'))){
-            callback(new Error('Bad file content!'), false);
+            req.fileFilterError = "Bad file content!";
+            callback(null, false);
             return;
           }
 
@@ -122,7 +124,22 @@ export class ArticleController {
 
       })
     )
-    async uploadPhoto(@Param('id') articleId: number, @UploadedFile() photo): Promise<ApiResponse | Photo>{
+    async uploadPhoto(
+      @Param('id') articleId: number,
+      @UploadedFile() photo,
+      @Req() req
+      ): Promise<ApiResponse | Photo>{
+        if(req.fileFilterError){
+          return new ApiResponse('error', -4002, req.fileFilterError) // -4002 greske iz fileFilterError-a
+        }
+
+        // TODO: Real Mime Type check
+
+        // TODO: Save a resize file
+
+        if(!photo){
+          return new ApiResponse('error', -4002, 'File not uploaded!');
+        }
       
 
       const newPhoto: Photo = new Photo();
