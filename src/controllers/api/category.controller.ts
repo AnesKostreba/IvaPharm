@@ -10,7 +10,7 @@ import { ApiTags } from '@nestjs/swagger';
   },
   params: {
     categoryId: {
-      field: 'categoryId',
+      field: 'category_id',
       type: 'number',
       primary: true
     }

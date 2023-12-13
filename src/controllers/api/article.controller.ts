@@ -20,7 +20,7 @@ import * as sharp from "sharp";
   },
   params:{
     id:{
-      field: 'articleId',
+      field: 'article_id',
       type: 'number',
       primary: true
     }

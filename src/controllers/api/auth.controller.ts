@@ -24,7 +24,7 @@ export class AuthController {
 
         if(!administrator){ // ako user ne postoji
             return new Promise(resolve=>{
-                resolve(new ApiResponse('error', -3001)) // -3001 = administrator nije pronadjen
+                resolve(new ApiResponse('error', -3001, 'Administrator nije pronadjen!')) // -3001 = administrator nije pronadjen
             })
         }
 
