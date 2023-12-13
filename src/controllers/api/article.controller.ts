@@ -1,14 +1,18 @@
 import { Crud, CrudRequest, Override, ParsedRequest } from "@nestjsx/crud";
 import { Controller, Get, Post, Body, Param, UseInterceptors, UploadedFile, Req } from '@nestjs/common';
 import { ArticleService } from "src/services/article/article.service";
-import { Article } from "entities/article.entity";
+import { Article } from "src/entities/article.entity";
 import { AddArticleDto } from "src/dtos/article/add.article.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from 'multer';
 import { StorageConfig } from "config/storage.config";
-import { Photo } from "entities/photo.entity";
+import { Photo } from "src/entities/photo.entity";
 import { PhotoService } from "src/services/photo/photo.service";
 import { ApiResponse } from "src/misc/api.response.class";
+import * as fileType from 'file-type';
+import * as fs from 'fs';
+import * as sharp from "sharp";
+
 @Controller('api/article')
 @Crud({
   model: {
@@ -72,7 +76,7 @@ export class ArticleController {
     @UseInterceptors(
       FileInterceptor('photo',{
         storage: diskStorage({
-          destination: StorageConfig.photoDestination,
+          destination: StorageConfig.photo.destination,
           filename: (req, file, callback) =>{
             // 'Neka slika.jpg' ->
             // '20230420-589327432-Neka-slika.jpg'
@@ -110,7 +114,7 @@ export class ArticleController {
 
           // 2. provera tipa sadrzaja: image/jpeg, image/png (mimetype)
           if(!(file.mimetype.includes('jpeg') || file.mimetype.includes('png'))){
-            req.fileFilterError = "Bad file content!";
+            req.fileFilterError = "Bad file content type!";
             callback(null, false);
             return;
           }
@@ -119,7 +123,7 @@ export class ArticleController {
         },
         limits:{
           files: 1,
-          fileSize:  StorageConfig.photoMaxFileSize,
+          fileSize:  StorageConfig.photo.maxSize,
         }
 
       })
@@ -132,15 +136,34 @@ export class ArticleController {
         if(req.fileFilterError){
           return new ApiResponse('error', -4002, req.fileFilterError) // -4002 greske iz fileFilterError-a
         }
-
-        // TODO: Real Mime Type check
-
-        // TODO: Save a resize file
-
         if(!photo){
           return new ApiResponse('error', -4002, 'File not uploaded!');
         }
-      
+
+        
+        
+        // TODO: Real Mime Type check
+
+        const fileTypeResult = await fileType.fromFile(photo.path);
+        if(!fileTypeResult){
+          // TODO: Obrisati taj fajl
+          fs.unlinkSync(photo.path);
+          return new ApiResponse('error', -4002, 'Cannot detect file type!!');
+        }
+
+        const realMimeType = fileTypeResult.mime;
+        if(!(realMimeType.includes('jpeg') || realMimeType.includes('png'))){
+          // TODO: Obrisati taj fajl
+          fs.unlinkSync(photo.path);
+          return new ApiResponse('error', -4002, "Bad file content type!");
+        }
+           
+
+        // TODO: Save a resize file
+
+        await this.createResizedImage(photo, StorageConfig.photo.resize.thumb)
+        await this.createResizedImage(photo, StorageConfig.photo.resize.small)
+
 
       const newPhoto: Photo = new Photo();
       newPhoto.articleId = articleId;
@@ -153,5 +176,23 @@ export class ArticleController {
 
       return savedPhoto;
     }
-  
+
+
+    async createResizedImage(photo, resizeSettings){
+      const originalFilePath = photo.path;
+      const fileName = photo.filename;
+
+      const destinationFilePath = 
+      StorageConfig.photo.destination + 
+      resizeSettings.directory + 
+      fileName;
+
+      await sharp(originalFilePath)
+            .resize({
+              fit: "cover",
+              width: resizeSettings.width,
+              height: resizeSettings.height,
+            })
+            .toFile(destinationFilePath);
+    }
 }

@@ -1,5 +1,5 @@
 import { Crud, CrudController, CrudRequest, Override, ParsedRequest } from "@nestjsx/crud";
-import { Category } from "entities/category.entity";
+import { Category } from "src/entities/category.entity";
 import { CategoryService } from "src/services/category/category.service";
 import { Controller, Get, Injectable, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
