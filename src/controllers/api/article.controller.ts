@@ -1,5 +1,5 @@
 import { Crud, CrudRequest, Override, ParsedRequest } from "@nestjsx/crud";
-import { Controller, Get, Post, Body, Param, UseInterceptors, UploadedFile, Req, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseInterceptors, UploadedFile, Req, Delete, Patch } from '@nestjs/common';
 import { ArticleService } from "src/services/article/article.service";
 import { Article } from "src/entities/article.entity";
 import { AddArticleDto } from "src/dtos/article/add.article.dto";
@@ -12,6 +12,7 @@ import { ApiResponse } from "src/misc/api.response.class";
 import * as fileType from 'file-type';
 import * as fs from 'fs';
 import * as sharp from "sharp";
+import { EditArticleDto } from "src/dtos/article/edit.article.dto";
 
 @Controller('api/article')
 @Crud({
@@ -43,6 +44,9 @@ import * as sharp from "sharp";
         eager: false
       }
     }
+  },
+  routes: {
+    exclude: [ 'updateOneBase', 'replaceOneBase', 'deleteOneBase' ],
   }
 })
 export class ArticleController {
@@ -70,6 +74,11 @@ export class ArticleController {
   @Post('createFull') // POST http://localhost:3000/api/article/createFull/
   createFullArticle(@Body() data: AddArticleDto){
     return this.service.createFullArticle(data);
+  }
+
+  @Patch(':id') // PATCH http://localhost:3000/api/article/2/
+  editFullArticle(@Param('id') id: number, @Body() data: EditArticleDto){
+    return this.service.editFullArticle(id, data);
   }
 
   @Post(':id/uploadPhoto') //POST http://localhost:3000/api/article/:id/uploadPhoto
