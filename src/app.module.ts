@@ -87,7 +87,8 @@ import { UserService } from './services/user/user.service';
     ArticleService
   ],
   exports:[
-    AdministratorService
+    AdministratorService,
+    UserService
   ]
 })
 
