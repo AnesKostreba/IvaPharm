@@ -87,7 +87,7 @@ export class ArticleController {
 
     return article;
   }
-  @Post('createFull') // POST http://localhost:3000/api/article/createFull/
+  @Post() // POST http://localhost:3000/api/article/
   @UseGuards(RoleCheckedGuard)
   @AllowToRoles('administrator')
   createFullArticle(@Body() data: AddArticleDto) {
