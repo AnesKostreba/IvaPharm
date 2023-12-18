@@ -1,8 +1,10 @@
 import { Crud, CrudController, CrudRequest, Override, ParsedRequest } from "@nestjsx/crud";
 import { Feature } from "src/entities/feature.entity";
 import { FeatureService } from "src/services/feature/feature.service";
-import { Body, Controller, Get, Injectable, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Injectable, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { RoleCheckedGuard } from "src/misc/role.checker.guard";
+import { AllowToRoles } from "src/misc/allow.to.roles.descriptor";
 
 @Crud({
     model: {
@@ -31,12 +33,42 @@ import { ApiTags } from '@nestjs/swagger';
     },
     routes: {
         only: [
+            'createOneBase',
+            'createManyBase',
+            'updateOneBase',
             'getManyBase',
             'getOneBase',
-            'createOneBase',
-            'updateOneBase',
-            'deleteOneBase',
         ],
+        createOneBase: {
+            decorators: [
+                UseGuards(RoleCheckedGuard),
+                AllowToRoles('administrator'),
+            ],
+        },
+        createManyBase: {
+            decorators: [
+                UseGuards(RoleCheckedGuard),
+                AllowToRoles('administrator'),
+            ],
+        },
+        updateOneBase: {
+            decorators: [
+                UseGuards(RoleCheckedGuard),
+                AllowToRoles('administrator'),
+            ],
+        },
+        getManyBase: {
+            decorators: [
+                UseGuards(RoleCheckedGuard),
+                AllowToRoles('administrator', 'user'),
+            ],
+        },
+        getOneBase: {
+            decorators: [
+                UseGuards(RoleCheckedGuard),
+                AllowToRoles('administrator', 'user'),
+            ],
+        },
     },
 })
 @ApiTags('api/feature')
